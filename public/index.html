@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Versed</title>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/min/basic.min.css" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.1.1/min/dropzone.min.css" rel="stylesheet">
+        <style>
+            .file-area {
+                width: 100%;
+                position: relative;
+            }
+            .file-area input[type=file] {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                opacity: 0;
+                cursor: pointer;
+            }
+            .file-area .file-dummy {
+                width: 100%;
+                padding: 30px;
+                background: rgba(255, 255, 255, 0.2);
+                border: 2px dashed rgba(255, 255, 255, 0.2);
+                text-align: center;
+                transition: background 0.3s ease-in-out;
+                line-height: 1.6;
+                color: #fff;
+            }
+            .file-area .file-dummy .icon {
+                font-size: 64px;
+                color: rgba(255, 255, 255, 0.6);
+                display: block;
+                margin: 0 auto 50px auto;
+            }
+            .file-area .file-dummy .success {
+                display: none;
+            }
+            .file-area:hover .file-dummy {
+                background: rgba(255, 255, 255, 0.1);
+            }
+            .file-area input[type=file]:focus + .file-dummy {
+                outline: 2px solid rgba(255, 255, 255, 0.5);
+                outline: -webkit-focus-ring-color auto 5px;
+            }
+            .file-area input[type=file]:valid + .file-dummy {
+                border-color: rgba(0, 255, 0, 0.1);
+                background-color: rgba(0, 255, 0, 0.05);
+            }
+            .file-area input[type=file]:valid + .file-dummy .success {
+                display: inline;
+            }
+            .file-area input[type=file]:valid + .file-dummy .default {
+                display: none;
+            }
+            input[name=format] {
+                text-align: center;
+            }
+            h1.ui.header {
+                font-size: 48px;
+                font-weight: 200;
+                margin-bottom: 30px;
+            }
+            .background {
+                position: fixed;
+                left: 0;
+                right: 0;
+                top: 0;
+                bottom: 0;
+                background-image: url(./background.jpg);
+                background-size: cover;
+                z-index: -1000;
+            }
+            .content {
+                max-width: 600px;
+                padding: 50px 0;
+                margin: auto;
+            }
+            footer {
+                font-size: 16px;
+                color: #fff;
+                text-align: center;
+                background: rgba(0, 0, 0, 0.5);
+                padding: 16px;
+                opacity: 0.6;
+            }
+        </style>
+    </head>
+    <body>
+        <canvas class="background"></canvas>
+        <div class="ui container">
+            <div class="content">
+                <h1 class="ui inverted center aligned header">Versed</h1>
+                <form action="/convert" method="POST" enctype="multipart/form-data" class="ui massive form">
+                    <div class="field">
+                        <div class="file-area">  
+                            <input type="file" name="file" required>
+                            <div class="file-dummy">
+                                <span class="success">
+                                    <i class="file icon"></i>
+                                    Done!
+                                </span>
+                                <span class="default">
+                                    <i class="file icon"></i>
+                                    Choose a file or drag it here.
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field">  
+                        <input name="format" required class="ui inverted input" placeholder="e.g., pdf, png, mp4, avi">
+                    </div>
+                    <div class="field">
+                        <button class="ui massive fluid inverted button">Convert</button>
+                    </div>
+                    <footer>
+                        Made with 💙 by <a href="https://github.com/sgbj/versed">sgbj</a>
+                    </footer>
+                </form>
+            </div>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/particlesjs/2.0.2/particles.min.js"></script>
+        <script>
+            Particles.init({
+                selector: '.background',
+                connectParticles: true,
+                color: '#77aace'
+            });
+        </script>
+    </body>
+</html>
