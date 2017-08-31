@@ -20,3 +20,4 @@ docker run -d -p 3000:3000 versed
 
 Open a browser window and go to http://localhost:3000/.
 
+Read the [blog post](http://aka.sb/Versed) to learn more!
