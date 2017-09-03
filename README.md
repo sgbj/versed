@@ -21,3 +21,18 @@ docker run -d -p 3000:3000 versed
 Open a browser window and go to http://localhost:3000/.
 
 Read the [blog post](http://aka.sb/Versed) to learn more!
+
+## Calling it from Node
+
+One way to consume the convert endpoint in Node.js code is by using the [request package](https://www.npmjs.com/package/request). 
+
+```js
+const fs = require('fs');
+const request = require('request');
+
+let req = request.post('http://localhost:3000/convert');
+let form = req.form();
+form.append('file', fs.createReadStream('video.mp4'));
+form.append('format', 'gif');
+req.pipe(fs.createWriteStream('image.gif'));
+```
