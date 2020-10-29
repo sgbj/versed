@@ -8,17 +8,8 @@ const tmp = require('tmp');
 tmp.setGracefulCleanup();
 
 module.exports = (context, next) => {
-    switch(context.input.mimetype) {
-        case 'image/tiff':
-            break;
-        default:
-            return next();
-    }
-    switch(context.input.type) {
-        case 'pdf':
-            break;
-        default:
-            return next();
+    if (context.input.type != 'image' ) {
+        return next();
     }
 
     const source = tmp.tmpNameSync({ postfix: path.extname(context.input.filename) });
