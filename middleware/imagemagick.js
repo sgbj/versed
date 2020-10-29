@@ -8,12 +8,18 @@ const tmp = require('tmp');
 tmp.setGracefulCleanup();
 
 module.exports = (context, next) => {
-    if (context.input.type == 'audio' || context.input.type == 'video') {
-        return next();
+    switch(context.input.mimetype) {
+        case 'image/tiff':
+            break;
+        default:
+            return next();
     }
-
-    //if (context.input.format != 'pdf') return next();
-
+    switch(context.input.type) {
+        case 'pdf':
+            break;
+        default:
+            return next();
+    }
 
     const source = tmp.tmpNameSync({ postfix: path.extname(context.input.filename) });
     const destination = path.basename(source, path.extname(context.input.filename)) + '.' + context.input.format;
