@@ -8,7 +8,7 @@ const tmp = require('tmp');
 tmp.setGracefulCleanup();
 
 module.exports = (context, next) => {
-    if (context.input.type == 'audio' || context.input.type == 'video') {
+    if (context.input.type == 'audio' || context.input.type == 'video' || context.input.type == 'image') {
         return next();
     }
 
