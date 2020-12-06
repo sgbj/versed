@@ -2,6 +2,10 @@ FROM node:alpine
 
 RUN apk add libreoffice ffmpeg imagemagick
 
+RUN apk add msttcorefonts-installer && \
+    update-ms-fonts && \
+    fc-cache -f
+
 WORKDIR /usr/src/app
 
 COPY package.json .
