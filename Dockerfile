@@ -1,9 +1,6 @@
-FROM node:current
+FROM node:alpine
 
-RUN apt-get update
-RUN apt-get install imagemagick -y
-RUN apt-get install libreoffice -y
-RUN apt-get install ffmpeg -y
+RUN apk add libreoffice ffmpeg imagemagick
 
 WORKDIR /usr/src/app
 
