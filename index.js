@@ -27,7 +27,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 app.post('/convert', upload.single('file'), function (req, res, next) {
-    const mimetype = mime.lookup(req.file.originalname);
+    const mimetype = mime.getType(req.file.originalname);
     const type = mimetype.split('/')[0];
 
     // Run file through the pipeline
@@ -47,7 +47,7 @@ app.post('/convert', upload.single('file'), function (req, res, next) {
         // Send the result or error
         if (context.output) {
             res.writeHead(200, {
-                'Content-Type': mime.lookup(context.input.format),
+                'Content-Type': mime.getType(context.input.format),
                 'Content-disposition': 'attachment;filename=' 
                     + path.basename(context.input.filename, path.extname(context.input.filename)) 
                     + '.' + req.body.format,
