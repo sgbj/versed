@@ -1,10 +1,11 @@
 FROM node:current
 
 RUN apt-get update
-RUN apt-get install imagemagick -y
-RUN apt-get install libreoffice -y
-RUN apt-get install ffmpeg -y
-
+RUN apt-get install imagemagick -y && apt-get clean
+RUN apt-get install libreoffice -y && apt-get clean
+RUN apt-get install ffmpeg -y && apt-get clean
+RUN apt-get install tesseract-ocr -y && apt-get clean
+RUN apt-get upgrade -y
 WORKDIR /usr/src/app
 
 COPY package.json .
