@@ -36,7 +36,8 @@ app.post('/convert', upload.single('file'), function (req, res, next) {
             filename: req.file.originalname,
             mimetype: mimetype,
             type: type,
-            buffer: req.file.buffer
+            buffer: req.file.buffer,
+            ocr: req.body.ocr
         }
     }, (context) => {
         if (context.error) {
