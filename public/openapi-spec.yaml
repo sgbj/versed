@@ -1,0 +1,50 @@
+swagger: '2.0'
+info:
+  title: "Versed conversion API"
+  version: '1.0'
+consumes:
+  - multipart/form-data; boundary=CUSTOM-BOUNDARY
+produces:
+  - audio/*; charset=utf-8
+  - image/*; charset=utf-8
+  - video/*; charset=utf-8
+  - application/*; charset=utf-8
+
+paths:
+  /convert:
+    post:
+      summary: Uploads a file, converts it to a different format and return
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: file
+          type: file
+          required: true
+          description: The file to convert.
+        - in: formData
+          name: format
+          type: string
+          required: true
+          description: |
+            Format to convert to. Some example formats: txt rtf doc docx ppt pptx xls xlsx csv html pdf
+            latex bib bmp svg eps tiff png jpg gif apng
+            mp3 ogg mp4 avi webm mkv mov flv
+      responses:
+        200:
+          description: Converted file.
+          schema:
+            type: file
+          headers:
+            Content-Disposition:
+              type: string
+              description: the format is `attachment; filename="name.zip"`
+            Content-Type:
+              type: string
+              description: typically this is equal to the format parameter.
+            Content-Length:
+              type: integer
+              format: int64
+              description: Length of the converted file.
+        500:
+          description: Error, in case conversion fails

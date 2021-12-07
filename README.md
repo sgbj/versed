@@ -22,6 +22,12 @@ docker run -d -p 3000:3000 versed
 
 Open a browser window and go to http://localhost:3000/.
 
+## OpenAPI
+
+You can access the OpenAPI (aka Swagger) 2.0 spec by accessing http://localhost:3000/openapi-spec.yaml or by opening the file in the public/ folder of the repo.
+You can generate a client for this microservice by using https://editor.swagger.io/.
+An example Python client (and an example usage script) is included in the clients/ folder of the repo.
+
 ## Calling it from Node
 
 One way to consume the convert endpoint in Node.js code is by using the [request package](https://www.npmjs.com/package/request). 

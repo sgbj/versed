@@ -4,7 +4,6 @@ const fs = require('fs');
 const path = require('path');
 const mime = require('mime');
 const express = require('express');
-const bodyParser = require('body-parser');
 const multer  = require('multer')
 
 const Middleware = require('./middleware');
@@ -20,20 +19,20 @@ fs.readdirSync(path.join(__dirname, 'middleware')).forEach(function(file) {
 const app = express();
 
 app.use(express.static('public'));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(express.urlencoded());
+app.use(express.json());
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 app.post('/convert', upload.single('file'), function (req, res, next) {
-    const mimetype = mime.lookup(req.file.originalname);
+    const mimetype = mime.getType(req.file.originalname);
     const type = mimetype.split('/')[0];
 
     // Run file through the pipeline
     middleware.run({
         input: {
-            format: req.body.format,
+            ...req.body,
             filename: req.file.originalname,
             mimetype: mimetype,
             type: type,
@@ -47,10 +46,10 @@ app.post('/convert', upload.single('file'), function (req, res, next) {
         // Send the result or error
         if (context.output) {
             res.writeHead(200, {
-                'Content-Type': mime.lookup(context.input.format),
+                'Content-Type': mime.getType(context.input.format),
                 'Content-disposition': 'attachment;filename=' 
                     + path.basename(context.input.filename, path.extname(context.input.filename)) 
-                    + '.' + req.body.format,
+                    + '.' + context.output.format || req.body.format,
                 'Content-Length': context.output.buffer.length
             });
             res.end(context.output.buffer);
