@@ -42,3 +42,11 @@ form.append('file', fs.createReadStream('video.mp4'));
 form.append('format', 'gif');
 req.pipe(fs.createWriteStream('image.gif'));
 ```
+
+## Calling it using curl
+
+```shell
+# this will convert `testdata/file-sample_100kB.docx` to pdf and save it using the filename given in the resonse header.
+curl -F format=pdf -F "file=@testdata/file-sample_100kB.docx" -OJ  http://localhost:3000/convert
+
+```
