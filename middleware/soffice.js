@@ -36,7 +36,7 @@ export default (context, next) => {
         params.unshift(`--infilter=${context.input.infilter}`);
     }
 
-    const process = childProcess.spawn('soffice', params);
+    const process = spawn('soffice', params);
     
     process.stdout.on('data', data => debug("out: %s", data.toString()));
     process.stderr.on('data', data => debug("err: %s", data.toString()));

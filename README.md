@@ -20,6 +20,12 @@ docker build -t versed .
 docker run -d -p 3000:3000 versed
 ```
 
+If you want a smaller container then please uncomment 
+```
+# test/fixtures/
+```
+in .dockeringore
+
 Open a browser window and go to http://localhost:3000/.
 
 ## OpenAPI
