@@ -19,7 +19,7 @@ fs.readdirSync(path.join(__dirname, 'middleware')).forEach(function(file) {
 const app = express();
 
 app.use(express.static('public'));
-app.use(express.urlencoded());
+app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
 const storage = multer.memoryStorage();
