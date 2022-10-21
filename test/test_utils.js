@@ -1,5 +1,7 @@
-var assert = require('assert');
-const util = require('../util')
+import assert from 'assert'
+// assert = require('assert');
+import * as util from '../util.js'
+// const util = require('../util.js')
 
 describe('Util', function () {
   describe('#mimetype()', function () {

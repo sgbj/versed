@@ -1,6 +1,6 @@
 
-const assert = require('assert');
-const ffmpeg = require('../middleware/ffmpeg')
+import assert from 'assert';
+import ffmpeg from '../middleware/ffmpeg.js'
 
 
 describe('ffmpeg', function () {

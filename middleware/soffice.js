@@ -1,14 +1,16 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-const childProcess = require('child_process');
-const tmp = require('tmp');
-const debug = require('debug')('versed:soffice');
+import fs from 'fs';
+import path from 'path'
+import { spawn } from 'child_process';
+import tmp from 'tmp'
+import Debug from 'debug'
+
+const debug = Debug('versed:soffice');
 
 tmp.setGracefulCleanup();
 
-module.exports = (context, next) => {
+export default (context, next) => {
     if (context.input.ocr || context.input.type == 'audio' || context.input.type == 'video' || context.input.type == 'image') {
         return next();
     }

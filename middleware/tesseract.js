@@ -1,14 +1,16 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-const childProcess = require('child_process');
-const tmp = require('tmp');
-const debug = require('debug')('versed:tesseract');
+import fs from 'fs';
+import path from 'path'
+import { spawn } from 'child_process';
+import tmp from 'tmp'
+import Debug from 'debug'
+
+const debug = Debug('versed:tesseract');
 
 tmp.setGracefulCleanup();
 
-module.exports = (context, next) => {
+export default (context, next) => {
     if (!context.input.ocr || context.input.type == 'audio' || context.input.type == 'video') {
         return next();
     }
@@ -37,7 +39,7 @@ module.exports = (context, next) => {
             return next();
     }
     debug('args: %o', args)
-    const process = childProcess.spawn('tesseract', args );
+    const process = spawn('tesseract', args );
     var out = ''; // in case of exit code != 0
     const addout = (from, data) => {
         const s = data.toString()

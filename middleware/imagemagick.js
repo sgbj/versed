@@ -1,14 +1,15 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-const childProcess = require('child_process');
-const tmp = require('tmp');
-const debug = require('debug')('versed:imagemagic');
+import fs from 'fs';
+import path from 'path'
+import { spawn } from 'child_process';
+import tmp from 'tmp'
+import Debug from 'debug'
 
+const debug = Debug('versed:imagemagic');
 tmp.setGracefulCleanup();
 
-module.exports = (context, next) => {
+export default (context, next) => {
     if (context.input.type != 'image' ) {
         return next();
     }
@@ -18,7 +19,7 @@ module.exports = (context, next) => {
 
     fs.writeFileSync(source, context.input.buffer);
 
-    const process = childProcess.spawn('convert', [
+    const process = spawn('convert', [
         source,
         destination
     ]);
