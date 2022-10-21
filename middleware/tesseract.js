@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const childProcess = require('child_process');
 const tmp = require('tmp');
+const debug = require('debug')('versed:tesseract');
 
 tmp.setGracefulCleanup();
 
@@ -15,9 +16,10 @@ module.exports = (context, next) => {
     const source = tmp.tmpNameSync({ postfix: path.extname(context.input.filename) });
     const outputbase = path.dirname(source) + '/' + path.basename(source, path.extname(context.input.filename));
     const destination = outputbase + '.' + context.input.format;
-    console.log("filename: " + context.input.filename );
-    console.log("source: " + source );
-    console.log("destination: " + destination);
+
+    debug('filename:', context.input.filename );
+    debug({source, outputbase, destination});
+
     fs.writeFileSync(source, context.input.buffer);
     var args = [
         source,
@@ -34,13 +36,26 @@ module.exports = (context, next) => {
         default:
             return next();
     }
+    debug('args: %o', args)
     const process = childProcess.spawn('tesseract', args );
-
-    process.stdout.on('data', data => console.log(data.toString()));
-    process.stderr.on('data', data => console.log(data.toString()));
+    var out = ''; // in case of exit code != 0
+    const addout = (from, data) => {
+        const s = data.toString()
+        debug("%s: %s", from, s)
+        out += s + '\n'
+    }
+    process.stdout.on('data', data => addout('out', data));
+    process.stderr.on('data', data => addout('err', data));
+    process.on('exit', (code) => {
+        debug('exit code: %d', code)
+        if (code !== 0) {
+            console.log('tesseract exited with code %d', code)
+            console.log(out)
+        }
+    });
 
     process.on('close', () => {
-        fs.readFile(destination + '.' + context.input.format, (err, data) => {
+        fs.readFile(destination, (err, data) => {
             if (err) {
                 context.error = err;
             } else {

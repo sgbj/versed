@@ -2,10 +2,11 @@
 
 const fs = require('fs');
 const path = require('path');
-const mime = require('mime');
 const express = require('express');
-const multer  = require('multer')
-
+const multer  = require('multer');
+const rfc2047 = require('rfc2047');
+const debug = require('debug')('versed')
+const util = require('./util');
 const Middleware = require('./middleware');
 
 // Create processing pipeline
@@ -26,16 +27,19 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 app.post('/convert', upload.single('file'), function (req, res, next) {
-    const mimetype = mime.getType(req.file.originalname);
-    const type = mimetype.split('/')[0];
-
+    const filename = rfc2047.decode(req.file.originalname)
+    const inboundMime = util.mimetype(filename)
+    if (!inboundMime) {
+        console.error(`issues generating mimetype from '${req.file.originalname}' as ${filename}`,  req.file)
+    }
+    
     // Run file through the pipeline
     middleware.run({
         input: {
             ...req.body,
-            filename: req.file.originalname,
-            mimetype: mimetype,
-            type: type,
+            filename: filename,
+            mimetype: inboundMime.full,
+            type: inboundMime.type,
             buffer: req.file.buffer,
             ocr: req.body.ocr
         }
@@ -43,16 +47,17 @@ app.post('/convert', upload.single('file'), function (req, res, next) {
         if (context.error) {
             console.error(context.error);
         }
-
+        const outboundMime = util.mimetype(context.input.format)
         // Send the result or error
-        if (context.output) {
-            res.writeHead(200, {
-                'Content-Type': mime.getType(context.input.format),
-                'Content-disposition': 'attachment;filename=' 
-                    + path.basename(context.input.filename, path.extname(context.input.filename)) 
-                    + '.' + context.output.format || req.body.format,
+        if (context.output) {           
+            const head = {
+                'Content-Type': outboundMime.full,
+                'Content-disposition': 'attachment;filename=' + path.basename(context.input.filename, path.extname(context.input.filename))
+                    + '.' + (context.output.format || req.body.format),
                 'Content-Length': context.output.buffer.length
-            });
+            }
+            debug("response: %o", head)
+            res.writeHead(200, head);
             res.end(context.output.buffer);
         } else {
             res.status(500).end();
@@ -60,12 +65,16 @@ app.post('/convert', upload.single('file'), function (req, res, next) {
     });
 });
 
-app.listen(3000, function () {
+const server = app.listen(3000, function () {
     console.log('Listening on port 3000');
 });
 
+module.exports = app;
 
 process.on('SIGINT', function() {
     console.log("Caught interrupt signal");
-    process.exit();
+    server.close(()=> {
+        process.exit();
+
+    }
 });

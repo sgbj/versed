@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const childProcess = require('child_process');
 const tmp = require('tmp');
+const debug = require('debug')('versed:soffice');
 
 tmp.setGracefulCleanup();
 
@@ -35,8 +36,8 @@ module.exports = (context, next) => {
 
     const process = childProcess.spawn('soffice', params);
     
-    process.stdout.on('data', data => console.log(data.toString()));
-    process.stderr.on('data', data => console.log(data.toString()));
+    process.stdout.on('data', data => debug("out: %s", data.toString()));
+    process.stderr.on('data', data => debug("err: %s", data.toString()));
 
     process.on('close', () => {
         fs.readFile(destination, (err, data) => {
