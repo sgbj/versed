@@ -1,13 +1,16 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-const childProcess = require('child_process');
-const tmp = require('tmp');
+import fs from 'fs';
+import path from 'path'
+import { spawn } from 'child_process';
+import tmp from 'tmp'
+import Debug from 'debug'
+
+const debug = Debug('versed:soffice');
 
 tmp.setGracefulCleanup();
 
-module.exports = (context, next) => {
+export default (context, next) => {
     if (context.input.ocr || context.input.type == 'audio' || context.input.type == 'video' || context.input.type == 'image') {
         return next();
     }
@@ -33,10 +36,10 @@ module.exports = (context, next) => {
         params.unshift(`--infilter=${context.input.infilter}`);
     }
 
-    const process = childProcess.spawn('soffice', params);
+    const process = spawn('soffice', params);
     
-    process.stdout.on('data', data => console.log(data.toString()));
-    process.stderr.on('data', data => console.log(data.toString()));
+    process.stdout.on('data', data => debug("out: %s", data.toString()));
+    process.stderr.on('data', data => debug("err: %s", data.toString()));
 
     process.on('close', () => {
         fs.readFile(destination, (err, data) => {

@@ -1,13 +1,15 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
-const childProcess = require('child_process');
-const tmp = require('tmp');
+import fs from 'fs';
+import path from 'path'
+import { spawn } from 'child_process';
+import tmp from 'tmp'
+import Debug from 'debug'
 
+const debug = Debug('versed:imagemagic');
 tmp.setGracefulCleanup();
 
-module.exports = (context, next) => {
+export default (context, next) => {
     if (context.input.type != 'image' ) {
         return next();
     }
@@ -17,13 +19,28 @@ module.exports = (context, next) => {
 
     fs.writeFileSync(source, context.input.buffer);
 
-    const process = childProcess.spawn('convert', [
+    const process = spawn('convert', [
         source,
         destination
     ]);
-
-    process.stdout.on('data', data => console.log(data.toString()));
-    process.stderr.on('data', data => console.log(data.toString()));
+    var out = ''; // in case of exit code != 0
+    const addout = (from, data) => {
+        const s = data.toString()
+        debug("%s: %s", from, s)
+        out += s + '\n'
+    }
+    process.stdout.on('data', data => addout('out',data));
+    process.stderr.on('data', data => addout('err', data));
+    process.on('exit', (code) => {
+        debug('exit: %d', code);
+        if (code !== 0) {
+            debug('exit code: %d', code)
+            if (code !== 0) {
+                console.log('imagedmagick exited with code %d', code)
+                console.log(out)
+            }
+        }
+    })
 
     process.on('close', () => {
         fs.readFile(destination, (err, data) => {

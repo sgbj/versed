@@ -20,6 +20,12 @@ docker build -t versed .
 docker run -d -p 3000:3000 versed
 ```
 
+If you want a smaller container then please uncomment 
+```
+# test/fixtures/
+```
+in .dockeringore
+
 Open a browser window and go to http://localhost:3000/.
 
 ## OpenAPI
@@ -41,4 +47,12 @@ let form = req.form();
 form.append('file', fs.createReadStream('video.mp4'));
 form.append('format', 'gif');
 req.pipe(fs.createWriteStream('image.gif'));
+```
+
+## Calling it using curl
+
+```shell
+# this will convert `testdata/file-sample_100kB.docx` to pdf and save it using the filename given in the resonse header.
+curl -F format=pdf -F "file=@testdata/file-sample_100kB.docx" -OJ  http://localhost:3000/convert
+
 ```
