@@ -30,6 +30,13 @@ paths:
             Format to convert to. Some example formats: txt rtf doc docx ppt pptx xls xlsx csv html pdf
             latex bib bmp svg eps tiff png jpg gif apng
             mp3 ogg mp4 avi webm mkv mov flv
+        - in: formData
+          name: ocr
+          type: boolean
+          required: false
+          description: | 
+            Should tesseract try to ocr.
+            Input types can't be audio or video
       responses:
         200:
           description: Converted file.
