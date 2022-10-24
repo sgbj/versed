@@ -59,3 +59,7 @@ typings/
 
 # IDEA
 .idea
+
+
+# VSCode
+.vscode/
