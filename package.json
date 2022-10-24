@@ -8,7 +8,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "lint": "eslint . --ext .js,.cjs",
+    "fixlint": "eslint . --ext .js,.cjs --fix"
   },
   "author": "",
   "license": "MIT",
@@ -21,6 +23,8 @@
     "tmp": "0.2.1"
   },
   "devDependencies": {
+    "eslint": "^8.26.0",
+    "file-type": "^18.0.0",
     "formdata-node": "^5.0.0",
     "got": "^12.5.2",
     "mocha": "^10.1.0"
