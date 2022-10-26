@@ -1,13 +1,11 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.245.2/containers/docker-existing-dockerfile
 {
-	"name": "Existing Dockerfile",
+	"name": "Node.js & Tools",
 
-	// Sets the run context to one level up instead of the .devcontainer folder.
-	"context": "..",
-
-	// Update the 'dockerFile' property if you aren't using the standard 'Dockerfile' filename.
-	"dockerFile": "../Dockerfile",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "versed",
+	"workspaceFolder": "/workspace",
 
 	"extensions": [
 		"eamodio.gitlens",
@@ -22,7 +20,7 @@
 	// "forwardPorts": [],
 
 	// Uncomment the next line to run commands after the container is created - for example installing curl.
-	"postCreateCommand": "apk add git"
+	"postCreateCommand": "npm install"
 	
 
 	// Uncomment when using a ptrace-based debugger like C++, Go, and Rust
