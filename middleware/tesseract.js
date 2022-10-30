@@ -1,17 +1,17 @@
 'use strict';
 
 import fs from 'fs';
-import path from 'path'
+import path from 'path';
 import { spawn } from 'child_process';
-import tmp from 'tmp'
-import Debug from 'debug'
+import tmp from 'tmp';
+import Debug from 'debug';
 
 const debug = Debug('versed:tesseract');
 
 tmp.setGracefulCleanup();
 
 export default (context, next) => {
-    if (!context.input.ocr || context.input.type == 'audio' || context.input.type == 'video') {
+    if (!context.input.ocr || context.input.type === 'audio' || context.input.type === 'video') {
         return next();
     }
 
@@ -28,31 +28,31 @@ export default (context, next) => {
         outputbase
     ];
     switch( context.input.format.toUpperCase() ) {
-        case 'TXT':
-            break;
-        case 'TSV':
-        case 'HORC':
-        case 'PDF':
-            args.push( context.input.format.toUpperCase() );
-            break;
-        default:
-            return next();
+    case 'TXT':
+        break;
+    case 'TSV':
+    case 'HORC':
+    case 'PDF':
+        args.push( context.input.format.toUpperCase() );
+        break;
+    default:
+        return next();
     }
-    debug('args: %o', args)
+    debug('args: %o', args);
     const process = spawn('tesseract', args );
     var out = ''; // in case of exit code != 0
     const addout = (from, data) => {
-        const s = data.toString()
-        debug("%s: %s", from, s)
-        out += s + '\n'
-    }
+        const s = data.toString();
+        debug('%s: %s', from, s);
+        out += s + '\n';
+    };
     process.stdout.on('data', data => addout('out', data));
     process.stderr.on('data', data => addout('err', data));
     process.on('exit', (code) => {
-        debug('exit code: %d', code)
+        debug('exit code: %d', code);
         if (code !== 0) {
-            console.log('tesseract exited with code %d', code)
-            console.log(out)
+            console.log('tesseract exited with code %d', code);
+            console.log(out);
         }
     });
 
@@ -61,7 +61,7 @@ export default (context, next) => {
             if (err) {
                 context.error = err;
             } else {
-                context.output = { 
+                context.output = {
                     buffer: data
                 };
                 fs.unlinkSync(destination);

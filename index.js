@@ -1,17 +1,16 @@
 'use strict';
 
-
 import { readdirSync } from 'fs';
-
+import * as url from 'node:url';
 import { fileURLToPath, pathToFileURL } from 'url';
 import { join, basename, extname, dirname } from 'path';
 import express, { static as staticfiles, urlencoded, json } from 'express';
 import multer, { memoryStorage } from 'multer';
 import rfc2047 from 'rfc2047';
-import Debug from 'debug'
+import Debug from 'debug';
 import { mimetype as _mimetype } from './util.js';
 import Middleware from './middleware.js';
-const debug = Debug('versed')
+const debug = Debug('versed');
 
 
 // const __filename = new URL(import.meta.url).pathname;
@@ -24,10 +23,9 @@ const __dirname = dirname(__filename);
 let middleware = new Middleware();
 
 
-
 readdirSync(join(__dirname, 'middleware')).forEach(async function(file) {
-    const module = await import(pathToFileURL(join(__dirname, 'middleware', file)))
-    debug('imported %s as middleware', file)
+    const module = await import(pathToFileURL(join(__dirname, 'middleware', file)));
+    debug('imported %s as middleware', file);
     middleware.use(module.default);
 });
 
@@ -41,13 +39,13 @@ app.use(json());
 const storage = memoryStorage();
 const upload = multer({ storage: storage });
 
-app.post('/convert', upload.single('file'), function (req, res, next) {
-    const filename = rfc2047.decode(req.file.originalname)
-    const inboundMime = _mimetype(filename)
+app.post('/convert', upload.single('file'), function (req, res) {
+    const filename = rfc2047.decode(req.file.originalname);
+    const inboundMime = _mimetype(filename);
     if (!inboundMime) {
-        console.error(`issues generating mimetype from '${req.file.originalname}' as ${filename}`,  req.file)
+        console.error(`issues generating mimetype from '${req.file.originalname}' as ${filename}`,  req.file);
     }
-    
+
     // Run file through the pipeline
     middleware.run({
         input: {
@@ -62,16 +60,16 @@ app.post('/convert', upload.single('file'), function (req, res, next) {
         if (context.error) {
             console.error(context.error);
         }
-        const outboundMime = _mimetype(context.input.format)
+        const outboundMime = _mimetype(context.input.format);
         // Send the result or error
-        if (context.output) {           
+        if (context.output) {
             const head = {
                 'Content-Type': outboundMime.full,
                 'Content-disposition': 'attachment;filename=' + basename(context.input.filename, extname(context.input.filename))
                     + '.' + (context.output.format || req.body.format),
                 'Content-Length': context.output.buffer.length
-            }
-            debug("response: %o", head)
+            };
+            debug('response: %o', head);
             res.writeHead(200, head);
             res.end(context.output.buffer);
         } else {
@@ -80,18 +78,34 @@ app.post('/convert', upload.single('file'), function (req, res, next) {
     });
 });
 
-export const server = app.listen(3000, function () {
-    console.log('Listening on port 3000');
-    setTimeout(()=>{
-        app.emit("appStarted");
-    }, 1000)
-});
+
+function main() {
+    const server = app.listen(3000, function () {
+        console.log('Listening on port 3000');
+        setTimeout(()=>{
+            app.emit('appStarted');
+        }, 1000);
+    });
+    process.on('SIGINT', function() {
+        console.log('Caught interrupt signal');
+        server.close(()=> {
+            process.exit();
+        });
+    });
+}
+
+// check if main module...
+if (typeof require !== 'undefined' && require.main === module) {
+    // is CommonJS main
+    main();
+} else if (import.meta.url.startsWith('file:')) { // (A)
+    // is ESM module main
+    const modulePath = url.fileURLToPath(import.meta.url);
+    // possibly test (import.meta.url === pathToFileURL(process.argv[1]).href)
+    if (process.argv[1] === modulePath) { // (B)
+        // Main ESM module
+        main();
+    }
+}
 
 export default app;
-
-process.on('SIGINT', function() {
-    console.log("Caught interrupt signal");
-    server.close(()=> {
-        process.exit();
-    });
-});

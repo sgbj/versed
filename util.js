@@ -1,5 +1,5 @@
 
-import mime from 'mime'
+import mime from 'mime';
 
 
 export function mimetype(filename) {
