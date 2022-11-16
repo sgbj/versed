@@ -10,7 +10,8 @@
   "scripts": {
     "test": "mocha",
     "lint": "eslint . --ext .js,.cjs",
-    "fixlint": "eslint . --ext .js,.cjs --fix"
+    "fixlint": "eslint . --ext .js,.cjs --fix",
+    "start": "node index.js"
   },
   "author": "",
   "license": "MIT",
