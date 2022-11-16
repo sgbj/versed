@@ -14,9 +14,10 @@ export default (context, next) => {
         return next();
     }
 
+    const {id} = context;
     const source = tmp.tmpNameSync({ postfix: path.extname(context.input.filename) });
     const destination = path.basename(source, path.extname(context.input.filename)) + '.' + context.input.format;
-    debug({source, destination});
+    debug('%s. %o', id, {source, destination});
 
     fs.writeFileSync(source, context.input.buffer);
 
@@ -27,15 +28,15 @@ export default (context, next) => {
     var out = ''; // in case of exit code != 0
     const addout = (from, data) => {
         const s = data.toString();
-        debug('%s: %s', from, s);
+        debug('%s. %s: %s', id, from, s);
         out += s + '\n';
     };
     process.stdout.on('data', data => addout('out',data));
     process.stderr.on('data', data => addout('err', data));
     process.on('exit', (code) => {
-        debug('exit: %d', code);
+        debug('%s. exit: %d', id, code);
         if (code !== 0) {
-            debug('exit code: %d', code);
+            debug('%s. exit code: %d', id, code);
             if (code !== 0) {
                 console.log('imagedmagick exited with code %d', code);
                 console.log(out);

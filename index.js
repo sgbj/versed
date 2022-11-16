@@ -10,6 +10,7 @@ import rfc2047 from 'rfc2047';
 import Debug from 'debug';
 import { mimetype as _mimetype } from './util.js';
 import Middleware from './middleware.js';
+import { randomUUID } from 'crypto';
 const debug = Debug('versed');
 
 
@@ -40,21 +41,25 @@ const storage = memoryStorage();
 const upload = multer({ storage: storage });
 
 app.post('/convert', upload.single('file'), function (req, res) {
+    const start = Date.now();
+    const id = randomUUID();
     const filename = rfc2047.decode(req.file.originalname);
     const inboundMime = _mimetype(filename);
     if (!inboundMime) {
         console.error(`issues generating mimetype from '${req.file.originalname}' as ${filename}`,  req.file);
     }
+    debug('POST %s %s %o', id, req.path, {originalname: req.file.originalname, mimetype:inboundMime.full, ocr: req.body.ocr, size: req.file.size});
 
     // Run file through the pipeline
     middleware.run({
+        id,
         input: {
             ...req.body,
             filename: filename,
             mimetype: inboundMime.full,
             type: inboundMime.type,
             buffer: req.file.buffer,
-            ocr: req.body.ocr
+            ocr: req.body.ocr,
         }
     }, (context) => {
         if (context.error) {
@@ -69,11 +74,12 @@ app.post('/convert', upload.single('file'), function (req, res) {
                     + '.' + (context.output.format || req.body.format),
                 'Content-Length': context.output.buffer.length
             };
-            debug('response: %o', head);
             res.writeHead(200, head);
             res.end(context.output.buffer);
+            debug('RESPONSE 200: %s, duration: %d ms, header: %o', id, Date.now()-start, head);
         } else {
             res.status(500).end();
+            debug('RESPONSE 500: %s, duration: %d ms', id, Date.now()-start);
         }
     });
 });
