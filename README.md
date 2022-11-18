@@ -13,18 +13,16 @@ Read the [blog post](http://aka.sb/Versed) to learn more!
 
 Run the following commands to get up and running.
 
-```
+```shell
 git clone https://github.com/sgbj/versed.git
 cd versed
 docker build -t versed .
 docker run -d -p 3000:3000 versed
-```
 
-If you want a smaller container then please uncomment 
+# this app uses https://github.com/debug-js/debug 
+# and if you want to see more logging use the DEBUG environment variable
+docker run -it --rm -e DEBUG=versed* -p 3000:3000 versed
 ```
-# test/fixtures/
-```
-in .dockeringore
 
 Open a browser window and go to http://localhost:3000/.
 

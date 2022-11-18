@@ -7,8 +7,9 @@ import {fileTypeFromBuffer}  from 'file-type';
 
 describe('soffice', function () {
     describe('middleware', function () {
-        it('should fail on missing data"', function () {
+        it('should fail on missing data', function () {
             const context = {
+                id: 'should fail on missing data',
                 input: {
                     type: 'docx',
                     filename: 'testdata/file-sample_100kB.docx',
@@ -23,9 +24,10 @@ describe('soffice', function () {
             );
         });
 
-        it('should convert docx to pdf"', function (done) {
+        it('should convert docx to pdf', function (done) {
             const buf = fs.readFileSync('test/fixtures/sample_text.png');
             const context = {
+                id: 'should convert docx to pdf',
                 input: {
                     type: 'docx',
                     filename: 'testdata/file-sample_100kB.docx',

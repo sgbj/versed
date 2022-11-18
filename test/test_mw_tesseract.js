@@ -6,8 +6,9 @@ import tesseract from '../middleware/tesseract.js';
 
 describe('tesseract', function () {
     describe('middleware', function () {
-        it('should fail on missing data"', function () {
+        it('should fail on missing data', function () {
             const context = {
+                id: 'should fail on missing data',
                 input: {
                     type: 'image',
                     filename: 'testdata/sample_text.png',
@@ -23,9 +24,10 @@ describe('tesseract', function () {
             );
         });
 
-        it('should ocr sample text from png"', function (done) {
+        it('should ocr sample text from png', function (done) {
             const buf = fs.readFileSync('test/fixtures/sample_text.png');
             const context = {
+                id: 'should ocr sample text from png',
                 input: {
                     type: 'image',
                     filename: 'sample_text.png',
