@@ -37,7 +37,9 @@ WORKDIR /usr/src/app
 COPY package.json .
 COPY package-lock.json .
 
-RUN npm install && npm audit fix --force
+ENV NODE_ENV production
+
+RUN npm install --omit=dev && npm audit fix --omit=dev --force
 
 COPY . .
 
