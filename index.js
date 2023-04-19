@@ -40,7 +40,9 @@ const app = express();
 app.use(staticfiles('public'));
 app.use(urlencoded({ extended: true }));
 app.use(json());
-app.use(auth);
+if (process.env.API_TOKEN) {
+    app.use(auth);
+}
 
 const storage = memoryStorage();
 const upload = multer({ storage: storage });
