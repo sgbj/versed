@@ -43,7 +43,8 @@ One way to consume the convert endpoint in Node.js code is by using the [request
 const fs = require('fs');
 const request = require('request');
 
-let req = request.post({url:'http://localhost:3000/convert', headers:{"Authorization":`Beader ${API_TOKEN}`}});
+let req = request.post({url:'http://localhost:3000/convert',
+headers:{"Authorization":`Bearer ${API_TOKEN}`}});
 let form = req.form();
 form.append('file', fs.createReadStream('video.mp4'));
 form.append('format', 'gif');
