@@ -16,6 +16,9 @@ Run the following commands to get up and running.
 ```shell
 git clone https://github.com/sgbj/versed.git
 cd versed
+# We've added an authentication layer using an API_TOKEN. 
+# You'll need to generate a token and set it as API_TOKEN value on the .env.dist file.
+cp .env.dist .env
 docker build -t versed .
 docker run -d -p 3000:3000 versed
 
@@ -40,7 +43,7 @@ One way to consume the convert endpoint in Node.js code is by using the [request
 const fs = require('fs');
 const request = require('request');
 
-let req = request.post('http://localhost:3000/convert');
+let req = request.post({url:'http://localhost:3000/convert', headers:{"Authorization":`Beader ${API_TOKEN}`}});
 let form = req.form();
 form.append('file', fs.createReadStream('video.mp4'));
 form.append('format', 'gif');
@@ -51,6 +54,24 @@ req.pipe(fs.createWriteStream('image.gif'));
 
 ```shell
 # this will convert `testdata/file-sample_100kB.docx` to pdf and save it using the filename given in the resonse header.
-curl -F format=pdf -F "file=@testdata/file-sample_100kB.docx" -OJ  http://localhost:3000/convert
+curl -H "Authorization: Bearer <API_TOKEN>" -F format=pdf -F "file=@testdata/file-sample_100kB.docx" -OJ  http://localhost:3000/convert
+
+```
+
+## Calling it using Python
+
+```python
+
+import requests
+
+files = {"file": open("demo.docx", "rb")}
+response = requests.post(
+    "http://localhost:3000/convert",
+    files=files,
+    data={"format": "pdf"},
+    headers={"Authorization": f"Bearer {API_TOKEN}"},
+)
+with open("demo.pdf", "wb+") as fp:
+    fp.write(response.content)
 
 ```
