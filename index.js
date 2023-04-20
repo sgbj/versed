@@ -11,11 +11,9 @@ import Debug from 'debug';
 import { mimetype as _mimetype } from './util.js';
 import Middleware from './middleware.js';
 import { randomUUID } from 'crypto';
-import dotenv from 'dotenv';
 import auth from './auth.js';
 
 const debug = Debug('versed');
-dotenv.config();
 
 
 // const __filename = new URL(import.meta.url).pathname;
