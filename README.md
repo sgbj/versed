@@ -16,15 +16,13 @@ Run the following commands to get up and running.
 ```shell
 git clone https://github.com/sgbj/versed.git
 cd versed
-# We've added an authentication layer using an API_TOKEN. 
-# You'll need to generate a token and set it as API_TOKEN value on the .env.dist file.
-cp .env.dist .env
 docker build -t versed .
-docker run -d -p 3000:3000 versed
-
-# this app uses https://github.com/debug-js/debug 
-# and if you want to see more logging use the DEBUG environment variable
-docker run -it --rm -e DEBUG=versed* -p 3000:3000 versed
+# This app uses https://github.com/debug-js/debug 
+# and if you want to see more logging use the DEBUG environment variable,
+# We've added an authentication layer using an API_TOKEN.
+# If you want to enable authentication you'll need to generate a token and set it as API_TOKEN value when creating the container.
+# This token we'll be used by the client to make request to the API.
+docker run -it --rm -e DEBUG=versed* -e API_TOKEN=<API_TOKEN> -p 3000:3000 versed
 ```
 
 Open a browser window and go to http://localhost:3000/.
@@ -43,8 +41,11 @@ One way to consume the convert endpoint in Node.js code is by using the [request
 const fs = require('fs');
 const request = require('request');
 
-let req = request.post({url:'http://localhost:3000/convert',
-headers:{"Authorization":`Bearer ${API_TOKEN}`}});
+let req = request.post({
+    url: 'http://localhost:3000/convert',
+    headers: { "Authorization": `Bearer ${API_TOKEN}` }
+});
+
 let form = req.form();
 form.append('file', fs.createReadStream('video.mp4'));
 form.append('format', 'gif');
