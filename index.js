@@ -89,6 +89,10 @@ app.post('/convert', upload.single('file'), function (req, res) {
     });
 });
 
+app.get('/ready', (req, res) => {
+    res.status(200).json({ message: 'OK' });
+});
+
 
 function main() {
     const server = app.listen(3000, function () {
