@@ -11,6 +11,8 @@ import Debug from 'debug';
 import { mimetype as _mimetype } from './util.js';
 import Middleware from './middleware.js';
 import { randomUUID } from 'crypto';
+import auth from './auth.js';
+
 const debug = Debug('versed');
 
 
@@ -24,7 +26,7 @@ const __dirname = dirname(__filename);
 let middleware = new Middleware();
 
 
-readdirSync(join(__dirname, 'middleware')).forEach(async function(file) {
+readdirSync(join(__dirname, 'middleware')).forEach(async function (file) {
     const module = await import(pathToFileURL(join(__dirname, 'middleware', file)));
     debug('imported %s as middleware', file);
     middleware.use(module.default);
@@ -34,8 +36,11 @@ readdirSync(join(__dirname, 'middleware')).forEach(async function(file) {
 const app = express();
 
 app.use(staticfiles('public'));
-app.use(urlencoded({extended: true}));
+app.use(urlencoded({ extended: true }));
 app.use(json());
+if (process.env.API_TOKEN) {
+    app.use(auth);
+}
 
 const storage = memoryStorage();
 const upload = multer({ storage: storage });
@@ -46,9 +51,9 @@ app.post('/convert', upload.single('file'), function (req, res) {
     const filename = rfc2047.decode(req.file.originalname);
     const inboundMime = _mimetype(filename);
     if (!inboundMime) {
-        console.error(`issues generating mimetype from '${req.file.originalname}' as ${filename}`,  req.file);
+        console.error(`issues generating mimetype from '${req.file.originalname}' as ${filename}`, req.file);
     }
-    debug('POST %s %s %o', id, req.path, {originalname: req.file.originalname, mimetype:inboundMime.full, ocr: req.body.ocr, size: req.file.size});
+    debug('POST %s %s %o', id, req.path, { originalname: req.file.originalname, mimetype: inboundMime.full, ocr: req.body.ocr, size: req.file.size });
 
     // Run file through the pipeline
     middleware.run({
@@ -76,25 +81,29 @@ app.post('/convert', upload.single('file'), function (req, res) {
             };
             res.writeHead(200, head);
             res.end(context.output.buffer);
-            debug('RESPONSE 200: %s, duration: %d ms, header: %o', id, Date.now()-start, head);
+            debug('RESPONSE 200: %s, duration: %d ms, header: %o', id, Date.now() - start, head);
         } else {
             res.status(500).end();
-            debug('RESPONSE 500: %s, duration: %d ms', id, Date.now()-start);
+            debug('RESPONSE 500: %s, duration: %d ms', id, Date.now() - start);
         }
     });
+});
+
+app.get('/ready', (req, res) => {
+    res.status(200).json({ message: 'OK' });
 });
 
 
 function main() {
     const server = app.listen(3000, function () {
         console.log('Listening on port 3000');
-        setTimeout(()=>{
+        setTimeout(() => {
             app.emit('appStarted');
         }, 1000);
     });
-    process.on('SIGINT', function() {
+    process.on('SIGINT', function () {
         console.log('Caught interrupt signal');
-        server.close(()=> {
+        server.close(() => {
             process.exit();
         });
     });
